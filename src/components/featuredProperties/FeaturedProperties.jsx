@@ -1,13 +1,15 @@
+import { Link } from "react-router-dom";
 import useFetch from "../../hooks/useFetch";
 import "./featuredProperties.css";
 
 const FeaturedProperties = () => {
   const { data, isLoading, error } = useFetch("/hotels?featured=true&limit=4");
-    console.log(data)
+    
   return (
     <div className="fp">
       {isLoading?"Loading":(
         data.map(item=>(
+          <Link to="/" style={{textDecoration:"none"}}>
           <div className="fpItem" key={item._id}>
           <img
             src="https://cf.bstatic.com/xdata/images/hotel/square600/13125860.webp?k=e148feeb802ac3d28d1391dad9e4cf1e12d9231f897d0b53ca067bde8a9d3355&o=&s=1"
@@ -24,12 +26,13 @@ const FeaturedProperties = () => {
           </div>
 }
           </div>
-
+          </Link>
         ))
 
       )
 }     
     </div>
+  
   );
 };
 

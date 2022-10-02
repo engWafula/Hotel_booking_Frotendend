@@ -4,7 +4,8 @@ import Header from "../../components/header/Header";
 import MailList from "../../components/mailList/MailList";
 import Footer from "../../components/footer/Footer";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useLocation } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
+import Reserve from "../../components/reserve/Reserve"
 import {
   faCircleArrowLeft,
   faCircleArrowRight,
@@ -15,15 +16,20 @@ import { useState } from "react";
 import useFetch from "../../hooks/useFetch";
 import { useContext } from "react";
 import { SearchContext } from "../../Context/searchContext";
+import { AuthContext } from "../../Context/authContext";
+import { useNavigate } from "react-router-dom";
 
 const Hotel = () => {
   const [slideNumber, setSlideNumber] = useState(0);
   const [open, setOpen] = useState(false);
+  const [openModal,setOpenModal] = useState(false);
   const location = useLocation()
-  const path = location.pathname.split("/")[2]
-  const { data, isLoading, error } = useFetch(`/hotels/find/${path}`);
+  const id = location.pathname.split("/")[2]
+  const { data, isLoading, error } = useFetch(`/hotels/find/${id}`);
   const {dates,options} = useContext(SearchContext)
-   console.log(dates)
+  const { loading, dispatch,user } = useContext(AuthContext);
+
+   const navigate =useNavigate()
   const photos = [
     {
       src: "https://cf.bstatic.com/xdata/images/hotel/max1280x900/261707778.jpg?k=56ba0babbcbbfeb3d3e911728831dcbc390ed2cb16c51d88159f82bf751d04c6&o=&hp=1",
@@ -54,7 +60,7 @@ const Hotel = () => {
 
   const days = dayDifference(dates[0].endDate, dates[0].startDate);
 
-
+   console.log(days)
 
   const handleOpen = (i) => {
     setSlideNumber(i);
@@ -72,6 +78,15 @@ const Hotel = () => {
 
     setSlideNumber(newSlideNumber)
   };
+
+  const handleClick = () =>{
+    if(!user){
+      navigate("/login")
+    }
+    else{
+      setOpenModal(true)
+    }
+  }
 
   return (
     <div>
@@ -102,7 +117,7 @@ const Hotel = () => {
           </div>
         )}
         <div className="hotelWrapper">
-          <button className="bookNow">Reserve or Book Now!</button>
+          <button onClick={handleClick} className="bookNow">Reserve or Book Now!</button>
           <h1 className="hotelTitle">{data.name}</h1>
           <div className="hotelAddress">
             <FontAwesomeIcon icon={faLocationDot} />
@@ -136,15 +151,15 @@ const Hotel = () => {
               </p>
             </div>
             <div className="hotelDetailsPrice">
-              <h1>Perfect for a 9-night stay!</h1>
+              <h1>Perfect for a {days}-night stay!</h1>
               <span>
                 Located in the real heart of {data.city}, this property has an
                 excellent location score of 9.8!
               </span>
               <h2>
-                <b>Ugx{data.cheapestPrice*days*options.rooms}</b> ({days} nights)
+                <b>Ugx{data.cheapestPrice * days * options.room}</b> ({days} nights)
               </h2>
-              <button>Reserve or Book Now!</button>
+              <button onClick={handleClick}> Book Now!</button>
             </div>
           </div>
         </div>
@@ -152,6 +167,7 @@ const Hotel = () => {
         <Footer />
       </div>
 }
+     {openModal && <Reserve setOpen={setOpenModal} hotelId={id}/> }
     </div>
   );
 };
