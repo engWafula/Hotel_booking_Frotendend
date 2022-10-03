@@ -14,7 +14,9 @@ const Navbar = () => {
           </span>
         <div className="navItems">
           {!user &&
+          <Link to="/login" style={{color:"inherit",textDecoration:"none"}}>
           <button className="navButton">Login</button>
+          </Link>
 }
 
 {user &&  <>
